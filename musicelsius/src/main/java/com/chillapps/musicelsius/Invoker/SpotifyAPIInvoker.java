@@ -1,49 +1,113 @@
 package com.chillapps.musicelsius.Invoker;
 
-import java.io.BufferedReader;
+import okhttp3.*;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
 
 public class SpotifyAPIInvoker {
+    private static final String CLIENT_ID = "3cb04550976b47198f64b4c37c066a37"; // Reemplaza con tu Client ID
+    private static final String CLIENT_SECRET = "c905499b96d44db1bda09760eb0dfde5"; // Reemplaza con tu Client Secret
+    private static final String TOKEN_URL = "https://accounts.spotify.com/api/token";
+    private static final String PLAYLIST_URL = "https://api.spotify.com/v1/playlists/{playlist_id}"; // Reemplaza {playlist_id} con el ID de la playlist
+    private static final String ROCK_PLAYLIST = "7EmlmN4hPwzhvRzo5o2Fjj";
+    private static final String PARTY_PLAYLIST = "6OGIeuozdAXY3Iq8WvhQCx";
+    private static final String POP_PLAYLIST = "4XUnwSKQ4tpzrfyYC0BPjT";
+    
+    public static String[] getSongs(String genre) {
+        try {
+        	String accessToken = getAccessToken();
+        	if(genre.equals("Rock"))
+        	{
+        		return getPlaylistTracks(accessToken, ROCK_PLAYLIST); // Reemplaza con el ID de la playlist
+        	}
+        	else if(genre.equals("Pop"))
+        	{
+        		return getPlaylistTracks(accessToken, POP_PLAYLIST); // Reemplaza con el ID de la playlist
+        	}
+        	else
+        	{
+        		return getPlaylistTracks(accessToken, PARTY_PLAYLIST); // Reemplaza con el ID de la playlist
+        	}
+            
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
 
-	StringBuffer response = new StringBuffer();
-	URL url;
+    private static String getAccessToken() throws IOException {
+        OkHttpClient client = new OkHttpClient();
+        String credentials = Credentials.basic(CLIENT_ID, CLIENT_SECRET);
+        RequestBody body = new FormBody.Builder().add("grant_type", "client_credentials").build();
 
-	public String getData()
-	{
-		try {
-			url = new URL("https://api.spotify.com/v1/tracks/11dFghVXANMlKmJXsNCbNl");
-			HttpURLConnection myURLConnection = (HttpURLConnection)url.openConnection();
-		} catch (MalformedURLException e) {
+        Request request = new Request.Builder()
+                .url(TOKEN_URL)
+                .post(body)
+                .addHeader("Authorization", credentials)
+                .build();
 
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-		try (BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream(), "UTF-8"))) {
-		    for (String line; (line = reader.readLine()) != null;) {
-		        System.out.println(line);
-		        response.append(line);
-		    }
-		} catch (UnsupportedEncodingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-		return response.toString();
-	}
+        Response response = client.newCall(request).execute();
+        if (response.isSuccessful()) {
+            String responseData = response.body().string();
+            JSONObject jsonObject = new JSONObject(responseData);
+            return jsonObject.getString("access_token");
+        } else {
+            throw new IOException("Error al obtener el token: " + response.code());
+        }
+    }
 
-	
-	
-	
-	
+    private static String[] getPlaylistTracks(String accessToken, String playlistId) throws IOException {
+        OkHttpClient client = new OkHttpClient();
+        String url = PLAYLIST_URL.replace("{playlist_id}", playlistId);
+        
+        Request request = new Request.Builder()
+                .url(url)
+                .addHeader("Authorization", "Bearer " + accessToken)
+                .build();
+
+        Response response = client.newCall(request).execute();
+        if (response.isSuccessful()) {
+            String responseData = response.body().string();
+            
+            System.out.println("Detalles de la playlist: " + responseData);
+            try {
+                JSONObject jsonObject = new JSONObject(responseData);
+                JSONObject tracks = jsonObject.getJSONObject("tracks");
+                JSONArray items = tracks.getJSONArray("items");
+
+                // Crear un arreglo para almacenar los nombres de las canciones
+                String[] songNames = new String[items.length()];
+
+                for (int i = 0; i < items.length(); i++) {
+                    JSONObject track = items.getJSONObject(i).getJSONObject("track");
+                    songNames[i] = track.getString("name"); // Obtener el nombre de la canción
+                }
+                
+    
+
+                // Imprimir los nombres de las canciones
+                for (String songName : songNames) {
+                    System.out.println(songName);
+                }
+                
+                return songNames;
+
+            } catch (JSONException err) {
+                err.printStackTrace();
+                return null;
+            }
+        } else {
+            System.out.println("Error: " + response.code());
+            return null;
+        }
+    }
 }

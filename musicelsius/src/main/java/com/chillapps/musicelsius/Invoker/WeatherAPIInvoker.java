@@ -20,7 +20,7 @@ public class WeatherAPIInvoker <T>{
 	URL url;
 	
 	// https://api.openweathermap.org/data/2.5/weather?lat=33.44&lon=-94.04&exclude=hourly,daily&appid=7da5b758b2f9176fa6aedf47f21b1a03
-	public String getTemperature(T location)
+	public Double getTemperature(T location)
 	{
 		StringBuilder result = new StringBuilder();
 		Map<String, Object> respMap = null;
@@ -61,7 +61,7 @@ public class WeatherAPIInvoker <T>{
 		{
 			
 		}
-		return "Temperature: " + mainMap.get("temp");
+		return (Double) mainMap.get("temp");
 	}
 
 		public static Map<String, Object> jsonToMap(String str)

@@ -28,23 +28,44 @@ public class responseController {
 	//}
 
 	@RequestMapping(value = "/bycity/{city}", method = RequestMethod.GET)
-	public String getTemperature(@PathVariable String city) {
-		
-		//SpotifyAPIInvoker spotifyAPI = new SpotifyAPIInvoker();
-		
+	public String[] getTemperature(@PathVariable String city) {
 		WeatherAPIInvoker<String> weatherInvoker = new WeatherAPIInvoker<String>();
-		String result = weatherInvoker.getTemperature(city);
-		return " and our API says: " + result;
+		Double temperature = weatherInvoker.getTemperature(city);
+		SpotifyAPIInvoker spotify = new SpotifyAPIInvoker(); 
+		if(temperature>30)
+		{
+			return spotify.getSongs("Party");
+		}
+		else if(temperature>=15)
+		{
+			return spotify.getSongs("Pop");
+		}
+		else
+		{
+			return spotify.getSongs("Rock");
+		}
 	}
 	
 	@RequestMapping(value = "/bycoordinates/", method = RequestMethod.GET)
-	public String getTemperature(@RequestBody Coordinates coord) {
+	public String[] getTemperature(@RequestBody Coordinates coord) {
 		
 		Coordinates inputCoords = new Coordinates();
 		
 		WeatherAPIInvoker<Coordinates> weatherInvoker = new WeatherAPIInvoker<Coordinates>();
-		String result = weatherInvoker.getTemperature(inputCoords);
-		return " and our API says: " + result;
+		Double temperature = weatherInvoker.getTemperature(coord);
+		SpotifyAPIInvoker spotify = new SpotifyAPIInvoker(); 
+		if(temperature>30)
+		{
+			return spotify.getSongs("Party");
+		}
+		else if(temperature>=15)
+		{
+			return spotify.getSongs("Pop");
+		}
+		else
+		{
+			return spotify.getSongs("Rock");
+		}
 	}
 	
 	/*@RequestMapping(value = "testingartistresponsebody/{id}", method = RequestMethod.POST)
