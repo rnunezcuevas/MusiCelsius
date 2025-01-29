@@ -36,11 +36,6 @@
 		    <version>2.3.1</version>
 		</dependency>
 		<dependency>
-			<groupId>se.michaelthelin.spotify</groupId>
-			<artifactId>spotify-web-api-java</artifactId>
-			<version>7.0.0</version>
-		</dependency>
-		<dependency>
 		    <groupId>mysql</groupId>
 		    <artifactId>mysql-connector-java</artifactId>
 		    <version>8.0.25</version>
@@ -58,10 +53,6 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.projectlombok</groupId>
-			<artifactId>lombok</artifactId>
 		</dependency>
 		<dependency>
 		    <groupId>com.squareup.okhttp3</groupId>

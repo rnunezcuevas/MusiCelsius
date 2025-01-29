@@ -1,23 +1,16 @@
 package com.chillapps.musicelsius.Invoker;
 
 import okhttp3.*;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
-
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
 public class SpotifyAPIInvoker {
-    private static final String CLIENT_ID = "3cb04550976b47198f64b4c37c066a37"; // Reemplaza con tu Client ID
-    private static final String CLIENT_SECRET = "c905499b96d44db1bda09760eb0dfde5"; // Reemplaza con tu Client Secret
+    private static final String CLIENT_ID = "3cb04550976b47198f64b4c37c066a37";
+    private static final String CLIENT_SECRET = "c905499b96d44db1bda09760eb0dfde5";
     private static final String TOKEN_URL = "https://accounts.spotify.com/api/token";
-    private static final String PLAYLIST_URL = "https://api.spotify.com/v1/playlists/{playlist_id}"; // Reemplaza {playlist_id} con el ID de la playlist
+    private static final String PLAYLIST_URL = "https://api.spotify.com/v1/playlists/{playlist_id}";
     private static final String ROCK_PLAYLIST = "7EmlmN4hPwzhvRzo5o2Fjj";
     private static final String PARTY_PLAYLIST = "6OGIeuozdAXY3Iq8WvhQCx";
     private static final String POP_PLAYLIST = "4XUnwSKQ4tpzrfyYC0BPjT";
@@ -27,15 +20,15 @@ public class SpotifyAPIInvoker {
         	String accessToken = getAccessToken();
         	if(genre.equals("Rock"))
         	{
-        		return getPlaylistTracks(accessToken, ROCK_PLAYLIST); // Reemplaza con el ID de la playlist
+        		return getPlaylistTracks(accessToken, ROCK_PLAYLIST);
         	}
         	else if(genre.equals("Pop"))
         	{
-        		return getPlaylistTracks(accessToken, POP_PLAYLIST); // Reemplaza con el ID de la playlist
+        		return getPlaylistTracks(accessToken, POP_PLAYLIST);
         	}
         	else
         	{
-        		return getPlaylistTracks(accessToken, PARTY_PLAYLIST); // Reemplaza con el ID de la playlist
+        		return getPlaylistTracks(accessToken, PARTY_PLAYLIST);
         	}
             
         } catch (IOException e) {
@@ -61,7 +54,7 @@ public class SpotifyAPIInvoker {
             JSONObject jsonObject = new JSONObject(responseData);
             return jsonObject.getString("access_token");
         } else {
-            throw new IOException("Error al obtener el token: " + response.code());
+            throw new IOException("Error when getting the token: " + response.code());
         }
     }
 
@@ -84,17 +77,15 @@ public class SpotifyAPIInvoker {
                 JSONObject tracks = jsonObject.getJSONObject("tracks");
                 JSONArray items = tracks.getJSONArray("items");
 
-                // Crear un arreglo para almacenar los nombres de las canciones
+                // Creating an array in order to store tracks
                 String[] songNames = new String[items.length()];
 
                 for (int i = 0; i < items.length(); i++) {
                     JSONObject track = items.getJSONObject(i).getJSONObject("track");
-                    songNames[i] = track.getString("name"); // Obtener el nombre de la canción
+                    songNames[i] = track.getString("name"); // Get track name
                 }
-                
-    
 
-                // Imprimir los nombres de las canciones
+                // Printing tracks
                 for (String songName : songNames) {
                     System.out.println(songName);
                 }

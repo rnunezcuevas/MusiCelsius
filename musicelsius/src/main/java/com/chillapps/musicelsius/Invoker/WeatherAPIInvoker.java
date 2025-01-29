@@ -19,7 +19,6 @@ public class WeatherAPIInvoker <T>{
 
 	URL url;
 	
-	// https://api.openweathermap.org/data/2.5/weather?lat=33.44&lon=-94.04&exclude=hourly,daily&appid=7da5b758b2f9176fa6aedf47f21b1a03
 	public Double getTemperature(T location)
 	{
 		StringBuilder result = new StringBuilder();
@@ -27,7 +26,6 @@ public class WeatherAPIInvoker <T>{
 		Map<String, Object> mainMap = null;
 		try
 		{
-		
 			if(location instanceof String)
 			{
 				url = new URL(urlString.append("q=")
@@ -38,7 +36,7 @@ public class WeatherAPIInvoker <T>{
 			else
 			{
 				Coordinates input = (Coordinates)location;
-				url = new URL(urlString.append("lat=" + input.getLattitude())
+				url = new URL(urlString.append("lat=" + input.getLatitude())
 						.append("&lon=" + input.getLongitude())
 						.append(APIKEY)
 						.append(units).toString());
@@ -59,9 +57,9 @@ public class WeatherAPIInvoker <T>{
 		}
 		catch(Exception e)
 		{
-			
+			System.out.println("There has been an error when getting the temperature.");
 		}
-		return (Double) mainMap.get("temp");
+		return (double) mainMap.get("temp");
 	}
 
 		public static Map<String, Object> jsonToMap(String str)
