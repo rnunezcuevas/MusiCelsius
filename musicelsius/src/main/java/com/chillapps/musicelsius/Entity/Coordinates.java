@@ -16,4 +16,10 @@ public class Coordinates {
 	public void setLongitude(float altitude) {
 		this.longitude = altitude;
 	}
+	
+	@Override 
+	public String toString()
+	{
+		return "Lat:" + latitude + ", long:" + longitude;
+	}
 }

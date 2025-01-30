@@ -30,23 +30,23 @@ public class responseController {
 		WeatherAPIInvoker<String> weatherInvoker = new WeatherAPIInvoker<String>();
 		double temperature = weatherInvoker.getTemperature(city);
 		SpotifyAPIInvoker spotify = new SpotifyAPIInvoker(); 
-		
+		PersistenceThread persistenceThread;
 		if(temperature>30)
 		{
-			serviceCallRepository.insert_service_call("Party", "city_name", LocalDateTime.now(), 
-					temperature, city);
+			persistenceThread = new PersistenceThread(serviceCallRepository, "Party", "city_name", temperature, city);
+			persistenceThread.start();
 			return spotify.getSongs("Party");
 		}
 		else if(temperature>=15)
 		{
-			serviceCallRepository.insert_service_call("Pop", "city_name", LocalDateTime.now(), 
-					temperature, city);
+			persistenceThread = new PersistenceThread(serviceCallRepository, "Pop", "city_name", temperature, city);
+			persistenceThread.start();
 			return spotify.getSongs("Pop");
 		}
 		else
 		{
-			serviceCallRepository.insert_service_call("Rock", "city_name", LocalDateTime.now(), 
-					temperature, city);
+			persistenceThread = new PersistenceThread(serviceCallRepository, "Rock", "city_name", temperature, city);
+			persistenceThread.start();
 			return spotify.getSongs("Rock");
 		}
 	}
@@ -57,22 +57,24 @@ public class responseController {
 		WeatherAPIInvoker<Coordinates> weatherInvoker = new WeatherAPIInvoker<Coordinates>();
 		double temperature = weatherInvoker.getTemperature(coord);
 		SpotifyAPIInvoker spotify = new SpotifyAPIInvoker(); 
+		PersistenceThread persistenceThread;
+		
 		if(temperature>30)
 		{
-			serviceCallRepository.insert_service_call("Party", "coordinates", LocalDateTime.now(), 
-					temperature, coord.getLatitude() + ", " + coord.getLongitude());
+			persistenceThread = new PersistenceThread(serviceCallRepository, "Party", "coordinates", temperature, coord.toString());
+			persistenceThread.start();
 			return spotify.getSongs("Party");
 		}
 		else if(temperature>=15)
 		{
-			serviceCallRepository.insert_service_call("Pop", "coordinates", LocalDateTime.now(), 
-					temperature, coord.getLatitude() + ", " + coord.getLongitude());
+			persistenceThread = new PersistenceThread(serviceCallRepository, "Pop", "coordinates", temperature, coord.toString());
+			persistenceThread.start();
 			return spotify.getSongs("Pop");
 		}
 		else
 		{
-			serviceCallRepository.insert_service_call("Rock", "coordinates", LocalDateTime.now(), 
-					temperature, coord.getLatitude() + ", " + coord.getLongitude());
+			persistenceThread = new PersistenceThread(serviceCallRepository, "Rock", "coordinates", temperature, coord.toString());
+			persistenceThread.start();
 			return spotify.getSongs("Rock");
 		}
 	}
