@@ -43,11 +43,17 @@ public class responseController {
 			persistenceThread.start();
 			return spotify.getSongs("Pop");
 		}
-		else
+		else if(temperature>=10)
 		{
 			persistenceThread = new PersistenceThread(serviceCallRepository, "Rock", "city_name", temperature, city);
 			persistenceThread.start();
 			return spotify.getSongs("Rock");
+		}
+		else
+		{
+			persistenceThread = new PersistenceThread(serviceCallRepository, "Classic", "city_name", temperature, city);
+			persistenceThread.start();
+			return spotify.getSongs("Classic");
 		}
 	}
 	
@@ -71,11 +77,17 @@ public class responseController {
 			persistenceThread.start();
 			return spotify.getSongs("Pop");
 		}
-		else
+		else if(temperature>=10)
 		{
 			persistenceThread = new PersistenceThread(serviceCallRepository, "Rock", "coordinates", temperature, coord.toString());
 			persistenceThread.start();
 			return spotify.getSongs("Rock");
+		}
+		else
+		{
+			persistenceThread = new PersistenceThread(serviceCallRepository, "Classic", "city_name", temperature, coord.toString());
+			persistenceThread.start();
+			return spotify.getSongs("Classic");
 		}
 	}
 }

@@ -14,6 +14,7 @@ public class SpotifyAPIInvoker {
     private static final String ROCK_PLAYLIST = "7EmlmN4hPwzhvRzo5o2Fjj";
     private static final String PARTY_PLAYLIST = "6OGIeuozdAXY3Iq8WvhQCx";
     private static final String POP_PLAYLIST = "4XUnwSKQ4tpzrfyYC0BPjT";
+    private static final String CLASSIC_PLAYLIST = "3rCykffDnQgcYC39V7zist";
     
     public static String[] getSongs(String genre) {
         try {
@@ -25,6 +26,10 @@ public class SpotifyAPIInvoker {
         	else if(genre.equals("Pop"))
         	{
         		return getPlaylistTracks(accessToken, POP_PLAYLIST);
+        	}
+        	else if(genre.equals("Classic"))
+        	{
+        		return getPlaylistTracks(accessToken, CLASSIC_PLAYLIST);
         	}
         	else
         	{
