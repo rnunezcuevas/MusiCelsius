@@ -1,8 +1,10 @@
 package com.chillapps.musicelsius.Controller;
 
 
-import java.time.LocalDateTime;
+import java.util.List;
 
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -90,4 +92,38 @@ public class responseController {
 			return spotify.getSongs("Classic");
 		}
 	}
+	
+	@RequestMapping(value = "/topgenre/", method = RequestMethod.GET)
+    public String getTopGenre() {
+        Pageable pageable = PageRequest.of(0, 1);
+        List<Object[]> result = serviceCallRepository.findTopGenre(pageable);
+        if (!result.isEmpty()) {
+            Object[] topGenreData = result.get(0); 
+            String genre = (String) topGenreData[0];
+            Long numberOfCalls = ((Number) topGenreData[1]).longValue();
+
+            
+            String displayString = "Most Popular Genre is " + genre + ", with a number of calls: " + numberOfCalls;
+            return displayString; 
+        }
+
+        return "Service Call History Table returned no results."; 
+    }
+	
+	@RequestMapping(value = "/toplocation/", method = RequestMethod.GET)
+    public String getTopLocation() {
+        Pageable pageable = PageRequest.of(0, 1);
+        List<Object[]> result = serviceCallRepository.findTopLocation(pageable);
+        if (!result.isEmpty()) {
+            Object[] topLocationData = result.get(0); 
+            String location = (String) topLocationData[0];
+            Long numberOfCalls = ((Number) topLocationData[1]).longValue();
+
+            
+            String displayString = "Most Popular Location is " + location + ", with a number of calls: " + numberOfCalls;
+            return displayString; 
+        }
+
+        return "Service Call History Table returned no results."; 
+    }
 }
