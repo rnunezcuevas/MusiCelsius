@@ -37,7 +37,8 @@ public class SpotifyAPIInvoker {
         	}
             
         } catch (IOException e) {
-            e.printStackTrace();
+            System.out.println("An error ocurred during spotify API operations: "
+            		+e.getMessage());
             return null;
         }
     }
@@ -98,7 +99,8 @@ public class SpotifyAPIInvoker {
                 return songNames;
 
             } catch (JSONException err) {
-                err.printStackTrace();
+            	System.out.println("An error ocurred during the conversion to JSON object "
+            			+ "with the response data. " + err.getMessage());
                 return null;
             }
         } else {

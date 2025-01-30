@@ -15,6 +15,7 @@ import com.chillapps.musicelsius.Entity.Coordinates;
 import com.chillapps.musicelsius.Invoker.SpotifyAPIInvoker;
 import com.chillapps.musicelsius.Invoker.WeatherAPIInvoker;
 import com.chillapps.musicelsius.Repository.ServiceCallRepository;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 
 @RestController
 @RequestMapping("/musicelsius/playlist")
@@ -27,6 +28,7 @@ public class responseController {
 	}
 
 	@RequestMapping(value = "/bycity/{city}", method = RequestMethod.GET)
+	@CircuitBreaker(name = "myService", fallbackMethod = "fallbackMethodCity")
 	public String[] getTemperature(@PathVariable String city) {
 		
 		WeatherAPIInvoker<String> weatherInvoker = new WeatherAPIInvoker<String>();
@@ -60,6 +62,7 @@ public class responseController {
 	}
 	
 	@RequestMapping(value = "/bycoordinates/", method = RequestMethod.GET)
+	@CircuitBreaker(name = "myService", fallbackMethod = "fallbackMethodCoord")
 	public String[] getTemperature(@RequestBody Coordinates coord) {
 		
 		WeatherAPIInvoker<Coordinates> weatherInvoker = new WeatherAPIInvoker<Coordinates>();
@@ -94,6 +97,7 @@ public class responseController {
 	}
 	
 	@RequestMapping(value = "/topgenre/", method = RequestMethod.GET)
+	@CircuitBreaker(name = "myService", fallbackMethod = "fallbackMethodTopGenre")
     public String getTopGenre() {
         Pageable pageable = PageRequest.of(0, 1);
         List<Object[]> result = serviceCallRepository.findTopGenre(pageable);
@@ -111,6 +115,7 @@ public class responseController {
     }
 	
 	@RequestMapping(value = "/toplocation/", method = RequestMethod.GET)
+	@CircuitBreaker(name = "myService", fallbackMethod = "fallbackMethodTopLocation")
     public String getTopLocation() {
         Pageable pageable = PageRequest.of(0, 1);
         List<Object[]> result = serviceCallRepository.findTopLocation(pageable);
@@ -125,5 +130,23 @@ public class responseController {
         }
 
         return "Service Call History Table returned no results."; 
+    }
+	
+    public String[] fallbackMethodCity(Exception e) {
+    	return new String[] { "Service not available when fetching temperature"
+    			+ " for a city. Please try again later." };
+    }
+    
+    public String[] fallbackMethodCoord(Exception e) {
+    	return new String[] { "Service not available when fetching temperature"
+    			+ " for a set of coordinates. Please try again later." };
+    }
+    
+    public String fallbackMethodTopGenre(Exception e) {
+    	return "Service not available when fetching the top genre. Please try again later.";
+    }
+    
+    public String fallbackMethodTopLocation(Exception e) {
+    	return "Service not available when fetching the top location. Please try again later.";
     }
 }
