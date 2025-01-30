@@ -1,19 +1,19 @@
 package com.chillapps.musicelsius.Entity;
 
 public class Coordinates {
-	private float latitude;
-	private float longitude;
+	private double latitude;
+	private double longitude;
 	
-	public float getLatitude() {
+	public double getLatitude() {
 		return latitude;
 	}
-	public void setLatitude(float lattitude) {
-		this.latitude = lattitude;
+	public void setLatitude(double d) {
+		this.latitude = d;
 	}
-	public float getLongitude() {
+	public double getLongitude() {
 		return longitude;
 	}
-	public void setLongitude(float altitude) {
+	public void setLongitude(double altitude) {
 		this.longitude = altitude;
 	}
 	

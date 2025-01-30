@@ -1,12 +1,21 @@
 package com.chillapps.musicelsius.Invoker;
 
 import okhttp3.*;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.springframework.stereotype.Component;
+
 import java.io.IOException;
 
+@Component
 public class SpotifyAPIInvoker {
+	
+	private static final Logger logger = LogManager.getLogger(SpotifyAPIInvoker.class);
+	
     private static final String CLIENT_ID = "3cb04550976b47198f64b4c37c066a37";
     private static final String CLIENT_SECRET = "c905499b96d44db1bda09760eb0dfde5";
     private static final String TOKEN_URL = "https://accounts.spotify.com/api/token";
@@ -16,7 +25,7 @@ public class SpotifyAPIInvoker {
     private static final String POP_PLAYLIST = "4XUnwSKQ4tpzrfyYC0BPjT";
     private static final String CLASSIC_PLAYLIST = "3rCykffDnQgcYC39V7zist";
     
-    public static String[] getSongs(String genre) {
+    public String[] getSongs(String genre) {
         try {
         	String accessToken = getAccessToken();
         	if(genre.equals("Rock"))
@@ -37,7 +46,7 @@ public class SpotifyAPIInvoker {
         	}
             
         } catch (IOException e) {
-            System.out.println("An error ocurred during spotify API operations: "
+            logger.error("An error ocurred during spotify API operations: "
             		+e.getMessage());
             return null;
         }
@@ -77,7 +86,6 @@ public class SpotifyAPIInvoker {
         if (response.isSuccessful()) {
             String responseData = response.body().string();
             
-            System.out.println("Detalles de la playlist: " + responseData);
             try {
                 JSONObject jsonObject = new JSONObject(responseData);
                 JSONObject tracks = jsonObject.getJSONObject("tracks");
@@ -93,18 +101,19 @@ public class SpotifyAPIInvoker {
 
                 // Printing tracks
                 for (String songName : songNames) {
-                    System.out.println(songName);
+                    logger.info("Retrieved Song: " + songName);
                 }
                 
                 return songNames;
 
             } catch (JSONException err) {
-            	System.out.println("An error ocurred during the conversion to JSON object "
+            	logger.error("An error ocurred during the conversion to JSON object "
             			+ "with the response data. " + err.getMessage());
                 return null;
             }
         } else {
-            System.out.println("Error: " + response.code());
+            logger.error("Something went wrong with the response from"
+            		+ " the Spotify API: " + response.code());
             return null;
         }
     }

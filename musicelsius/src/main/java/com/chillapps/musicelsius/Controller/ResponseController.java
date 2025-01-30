@@ -14,47 +14,74 @@ import org.springframework.web.bind.annotation.RestController;
 import com.chillapps.musicelsius.Entity.Coordinates;
 import com.chillapps.musicelsius.Invoker.SpotifyAPIInvoker;
 import com.chillapps.musicelsius.Invoker.WeatherAPIInvoker;
+import com.chillapps.musicelsius.Invoker.WeatherAPIInvokerFactory;
 import com.chillapps.musicelsius.Repository.ServiceCallRepository;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 
 @RestController
 @RequestMapping("/musicelsius/playlist")
-public class responseController {
+public class ResponseController {
+	
+	private static final Logger logger = LogManager.getLogger(ResponseController.class);
 
 	private final ServiceCallRepository serviceCallRepository;
+	private SpotifyAPIInvoker spotify;
+	WeatherAPIInvoker<String> weatherAPIInvokerString;
+	WeatherAPIInvoker<Coordinates> weatherAPIInvokerCoord;
+	WeatherAPIInvokerFactory weatherAPIInvokerFactory;
 
-	responseController(ServiceCallRepository serviceCallRepository) {
+	ResponseController(SpotifyAPIInvoker spotify,
+			ServiceCallRepository serviceCallRepository,
+			WeatherAPIInvoker<String> weatherAPIInvokerString,
+			WeatherAPIInvoker<Coordinates> weatherAPIInvokerCoord,
+			WeatherAPIInvokerFactory weatherAPIInvokerFactory) 
+	{
 		this.serviceCallRepository = serviceCallRepository;
+		this.spotify = spotify;
+		this.weatherAPIInvokerString = weatherAPIInvokerString;
+		this.weatherAPIInvokerCoord = weatherAPIInvokerCoord;
+		this.weatherAPIInvokerFactory = weatherAPIInvokerFactory;
 	}
+
 
 	@RequestMapping(value = "/bycity/{city}", method = RequestMethod.GET)
 	@CircuitBreaker(name = "myService", fallbackMethod = "fallbackMethodCity")
-	public String[] getTemperature(@PathVariable String city) {
+	public String[] getSongs(@PathVariable String city) {
 		
-		WeatherAPIInvoker<String> weatherInvoker = new WeatherAPIInvoker<String>();
-		double temperature = weatherInvoker.getTemperature(city);
-		SpotifyAPIInvoker spotify = new SpotifyAPIInvoker(); 
+		weatherAPIInvokerString = weatherAPIInvokerFactory.createWeatherAPIInvokerString();
+		double temperature = weatherAPIInvokerString.getTemperature(city);
+		
+		logger.info("Received Weather: " + temperature);
+		logger.info("Received City: " + city);
+		
 		PersistenceThread persistenceThread;
 		if(temperature>30)
 		{
+			logger.info("Persisting " + city + " for Party Genre.");
 			persistenceThread = new PersistenceThread(serviceCallRepository, "Party", "city_name", temperature, city);
 			persistenceThread.start();
 			return spotify.getSongs("Party");
 		}
 		else if(temperature>=15)
 		{
+			logger.info("Persisting " + city + " for Pop Genre.");
 			persistenceThread = new PersistenceThread(serviceCallRepository, "Pop", "city_name", temperature, city);
 			persistenceThread.start();
 			return spotify.getSongs("Pop");
 		}
 		else if(temperature>=10)
 		{
+			logger.info("Persisting " + city + " for Rock Genre.");
 			persistenceThread = new PersistenceThread(serviceCallRepository, "Rock", "city_name", temperature, city);
 			persistenceThread.start();
 			return spotify.getSongs("Rock");
 		}
 		else
 		{
+			logger.info("Persisting " + city + " for Classic Genre.");
 			persistenceThread = new PersistenceThread(serviceCallRepository, "Classic", "city_name", temperature, city);
 			persistenceThread.start();
 			return spotify.getSongs("Classic");
@@ -63,33 +90,39 @@ public class responseController {
 	
 	@RequestMapping(value = "/bycoordinates/", method = RequestMethod.GET)
 	@CircuitBreaker(name = "myService", fallbackMethod = "fallbackMethodCoord")
-	public String[] getTemperature(@RequestBody Coordinates coord) {
+	public String[] getSongs(@RequestBody Coordinates coord) {
+		weatherAPIInvokerCoord = weatherAPIInvokerFactory.createWeatherAPIInvokerCoord();
+		double temperature = weatherAPIInvokerCoord.getTemperature(coord);
 		
-		WeatherAPIInvoker<Coordinates> weatherInvoker = new WeatherAPIInvoker<Coordinates>();
-		double temperature = weatherInvoker.getTemperature(coord);
-		SpotifyAPIInvoker spotify = new SpotifyAPIInvoker(); 
+		logger.info("Received Weather: " + temperature);
+		logger.info("Received Coordinates: " + coord);
+		
 		PersistenceThread persistenceThread;
 		
 		if(temperature>30)
 		{
+			logger.info("Persisting " + coord + " for Party Genre.");
 			persistenceThread = new PersistenceThread(serviceCallRepository, "Party", "coordinates", temperature, coord.toString());
 			persistenceThread.start();
 			return spotify.getSongs("Party");
 		}
 		else if(temperature>=15)
 		{
+			logger.info("Persisting " + coord + " for Pop Genre.");
 			persistenceThread = new PersistenceThread(serviceCallRepository, "Pop", "coordinates", temperature, coord.toString());
 			persistenceThread.start();
 			return spotify.getSongs("Pop");
 		}
 		else if(temperature>=10)
 		{
+			logger.info("Persisting " + coord + " for Rock Genre.");
 			persistenceThread = new PersistenceThread(serviceCallRepository, "Rock", "coordinates", temperature, coord.toString());
 			persistenceThread.start();
 			return spotify.getSongs("Rock");
 		}
 		else
 		{
+			logger.info("Persisting " + coord + " for Classic Genre.");
 			persistenceThread = new PersistenceThread(serviceCallRepository, "Classic", "city_name", temperature, coord.toString());
 			persistenceThread.start();
 			return spotify.getSongs("Classic");

@@ -7,11 +7,18 @@ import java.net.URLConnection;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.springframework.stereotype.Component;
+
 import com.chillapps.musicelsius.Entity.Coordinates;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
+@Component
 public class WeatherAPIInvoker <T>{
+
+	private static final Logger logger = LogManager.getLogger(WeatherAPIInvoker.class);
 	
 	final String APIKEY = "&appid=7da5b758b2f9176fa6aedf47f21b1a03";
 	String units = "&units=metric";
@@ -57,7 +64,7 @@ public class WeatherAPIInvoker <T>{
 		}
 		catch(Exception e)
 		{
-			System.out.println("There has been an error when getting the temperature.");
+			logger.error("There has been an error when getting the temperature.");
 		}
 		return (double) mainMap.get("temp");
 	}
