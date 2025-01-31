@@ -102,7 +102,7 @@ If you face any issues trying to get this app running, feel free to call me or s
 
 ## Architecture
 
-This Project follows an architecture containing the following:
+This Project follows an architecture containing the following components:
 
 - ResponseController, which takes care of the calls that our App will receive.
 - SpotifyAPIInvoker, which will make the calls to the Spotify API Service.
