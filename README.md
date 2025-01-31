@@ -65,7 +65,7 @@ END //
 
 DELIMITER ;
 ```
-
+**NOTE:** The Project has the flyway dependency and functionality applied, so you should be able to create these resources just by running the project.
 ## MusiCelsius Endpoints
 
 MusiCelsius has 4 available endpoints, listed below:
