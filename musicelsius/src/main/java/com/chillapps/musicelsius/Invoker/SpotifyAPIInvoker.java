@@ -16,8 +16,8 @@ public class SpotifyAPIInvoker {
 	
 	private static final Logger logger = LogManager.getLogger(SpotifyAPIInvoker.class);
 	
-    private static final String CLIENT_ID = "3cb04550976b47198f64b4c37c066a37";
-    private static final String CLIENT_SECRET = "c905499b96d44db1bda09760eb0dfde5";
+    private static final String CLIENT_ID = "Client ID Here";
+    private static final String CLIENT_SECRET = "Client Secret Here";
     private static final String TOKEN_URL = "https://accounts.spotify.com/api/token";
     private static final String PLAYLIST_URL = "https://api.spotify.com/v1/playlists/{playlist_id}";
     private static final String ROCK_PLAYLIST = "7EmlmN4hPwzhvRzo5o2Fjj";
