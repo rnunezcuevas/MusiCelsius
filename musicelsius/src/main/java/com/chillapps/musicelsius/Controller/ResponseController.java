@@ -152,7 +152,7 @@ public class ResponseController {
             String genre = (String) topGenreData[0];
             Long numberOfCalls = ((Number) topGenreData[1]).longValue();
 
-            
+            logger.info("Top Genre Invoked, results: " + genre + " with " + numberOfCalls);
             String displayString = "Most Popular Genre is " + genre 
             		+ ", with a number of calls: " + numberOfCalls;
             return displayString; 
@@ -171,7 +171,7 @@ public class ResponseController {
             String location = (String) topLocationData[0];
             Long numberOfCalls = ((Number) topLocationData[1]).longValue();
 
-            
+            logger.info("Top Location Invoked, results: " + location + " with " + numberOfCalls);
             String displayString = "Most Popular Location is " + location 
             		+ ", with a number of calls: " + numberOfCalls;
             return displayString; 
