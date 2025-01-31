@@ -2,7 +2,9 @@ package com.chillapps.musicelsius.Controller;
 
 
 import java.util.List;
+import java.util.concurrent.Semaphore;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -19,6 +21,8 @@ import com.chillapps.musicelsius.Repository.ServiceCallRepository;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import io.github.resilience4j.circuitbreaker.CircuitBreakerRegistry;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 
 @RestController
@@ -26,6 +30,11 @@ import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 public class ResponseController {
 	
 	private static final Logger logger = LogManager.getLogger(ResponseController.class);
+	
+	private volatile boolean isClosing = false;
+	
+	@Autowired
+	private CircuitBreakerRegistry circuitBreakerRegistry;
 
 	private final ServiceCallRepository serviceCallRepository;
 	private SpotifyAPIInvoker spotify;
@@ -166,7 +175,11 @@ public class ResponseController {
     }
 	
     public String[] fallbackMethodCity(String city, Exception e) {
+    	
     	logger.info("Executing fallback method for city name: " + e.getMessage());
+    	
+    	closeCircuitBreakerIfOpen("byCityName");
+    	
     	return new String[] { "Service not available when fetching temperature"
     			+ " for city " + city + ". Please make sure it's a valid city and try again later." };
     }
@@ -174,17 +187,50 @@ public class ResponseController {
     public String[] fallbackMethodCoord(Coordinates cord, Exception e) {
     	
     	logger.info("Executing fallback method for Coordinates: " + e.getMessage());
+    	
+    	closeCircuitBreakerIfOpen("byCoordinates");
+    	
     	return new String[] { "Service not available when fetching temperature"
     			+ " for the set of coordinates: " + cord.getLatitude()+ ", " + cord.getLongitude() + ". Please try again later." };
     }
     
     public String fallbackMethodTopGenre(Exception e) {
+    	
     	logger.info("Executing fallback method for Top Genre Service : " + e.getMessage());
+    	
+    	closeCircuitBreakerIfOpen("topGenre");
+    	
     	return "Service not available when fetching the top genre. Please try again later.";
     }
     
     public String fallbackMethodTopLocation(Exception e) {
+    	
     	logger.info("Executing fallback method for Top Location Service: " + e.getMessage());
+    	
+    	closeCircuitBreakerIfOpen("topLocation");
+    	
     	return "Service not available when fetching the top location. Please try again later.";
     }
+    
+public void closeCircuitBreakerIfOpen(String name)
+{
+	
+		//Using complete import here since we're using @CircuitBreaker and
+		//there's conflicts.
+		io.github.resilience4j.circuitbreaker.CircuitBreaker circuitBreaker 
+		= circuitBreakerRegistry.circuitBreaker(name);
+		
+		if(circuitBreaker!=null)
+		{
+			if(circuitBreaker.getState() == 
+					io.github.resilience4j.circuitbreaker.CircuitBreaker.State.OPEN)
+					{
+		                    CircuitBreakerCloser closer = new CircuitBreakerCloser();
+		                    closer.closeCircuitBreaker(circuitBreaker);
+					}
+		}
+		else
+			logger.info("CircuitBreaker " + name + " not found.");
+}
+
 }
