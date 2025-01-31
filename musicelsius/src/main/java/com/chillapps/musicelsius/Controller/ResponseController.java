@@ -2,7 +2,6 @@ package com.chillapps.musicelsius.Controller;
 
 
 import java.util.List;
-import java.util.concurrent.Semaphore;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
