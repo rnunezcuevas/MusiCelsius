@@ -29,8 +29,9 @@ import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 public class ResponseController {
 	
 	private static final Logger logger = LogManager.getLogger(ResponseController.class);
+    @Autowired
+    private CircuitBreakerCloser circuitBreakerCloser;
 	
-	private volatile boolean isClosing = false;
 	
 	@Autowired
 	private CircuitBreakerRegistry circuitBreakerRegistry;
@@ -110,28 +111,32 @@ public class ResponseController {
 		if(temperature>30)
 		{
 			logger.info("Persisting " + coord + " for Party Genre.");
-			persistenceThread = new PersistenceThread(serviceCallRepository, "Party", "coordinates", temperature, coord.toString());
+			persistenceThread = new PersistenceThread(serviceCallRepository, 
+					"Party", "coordinates", temperature, coord.toString());
 			persistenceThread.start();
 			return spotify.getSongs("Party");
 		}
 		else if(temperature>=15)
 		{
 			logger.info("Persisting " + coord + " for Pop Genre.");
-			persistenceThread = new PersistenceThread(serviceCallRepository, "Pop", "coordinates", temperature, coord.toString());
+			persistenceThread = new PersistenceThread(serviceCallRepository, 
+					"Pop", "coordinates", temperature, coord.toString());
 			persistenceThread.start();
 			return spotify.getSongs("Pop");
 		}
 		else if(temperature>=10)
 		{
 			logger.info("Persisting " + coord + " for Rock Genre.");
-			persistenceThread = new PersistenceThread(serviceCallRepository, "Rock", "coordinates", temperature, coord.toString());
+			persistenceThread = new PersistenceThread(serviceCallRepository, 
+					"Rock", "coordinates", temperature, coord.toString());
 			persistenceThread.start();
 			return spotify.getSongs("Rock");
 		}
 		else
 		{
 			logger.info("Persisting " + coord + " for Classic Genre.");
-			persistenceThread = new PersistenceThread(serviceCallRepository, "Classic", "city_name", temperature, coord.toString());
+			persistenceThread = new PersistenceThread(serviceCallRepository, 
+					"Classic", "city_name", temperature, coord.toString());
 			persistenceThread.start();
 			return spotify.getSongs("Classic");
 		}
@@ -148,7 +153,8 @@ public class ResponseController {
             Long numberOfCalls = ((Number) topGenreData[1]).longValue();
 
             
-            String displayString = "Most Popular Genre is " + genre + ", with a number of calls: " + numberOfCalls;
+            String displayString = "Most Popular Genre is " + genre 
+            		+ ", with a number of calls: " + numberOfCalls;
             return displayString; 
         }
 
@@ -166,7 +172,8 @@ public class ResponseController {
             Long numberOfCalls = ((Number) topLocationData[1]).longValue();
 
             
-            String displayString = "Most Popular Location is " + location + ", with a number of calls: " + numberOfCalls;
+            String displayString = "Most Popular Location is " + location 
+            		+ ", with a number of calls: " + numberOfCalls;
             return displayString; 
         }
 
@@ -190,7 +197,8 @@ public class ResponseController {
     	closeCircuitBreakerIfOpen("byCoordinates");
     	
     	return new String[] { "Service not available when fetching temperature"
-    			+ " for the set of coordinates: " + cord.getLatitude()+ ", " + cord.getLongitude() + ". Please try again later." };
+    			+ " for the set of coordinates: " + cord.getLatitude()+ ", " 
+    			+ cord.getLongitude() + ". Please try again later." };
     }
     
     public String fallbackMethodTopGenre(Exception e) {
@@ -224,8 +232,7 @@ public void closeCircuitBreakerIfOpen(String name)
 			if(circuitBreaker.getState() == 
 					io.github.resilience4j.circuitbreaker.CircuitBreaker.State.OPEN)
 					{
-		                    CircuitBreakerCloser closer = new CircuitBreakerCloser();
-		                    closer.closeCircuitBreaker(circuitBreaker);
+					circuitBreakerCloser.closeCircuitBreaker(circuitBreaker);
 					}
 		}
 		else
