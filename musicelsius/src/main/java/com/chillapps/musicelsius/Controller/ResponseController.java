@@ -48,7 +48,7 @@ public class ResponseController {
 
 
 	@RequestMapping(value = "/bycity/{city}", method = RequestMethod.GET)
-	@CircuitBreaker(name = "myService", fallbackMethod = "fallbackMethodCity")
+	@CircuitBreaker(name = "byCityName", fallbackMethod = "fallbackMethodCity")
 	public String[] getSongs(@PathVariable String city) {
 		
 		weatherAPIInvokerString = weatherAPIInvokerFactory.createWeatherAPIInvokerString();
@@ -89,7 +89,7 @@ public class ResponseController {
 	}
 	
 	@RequestMapping(value = "/bycoordinates/", method = RequestMethod.GET)
-	@CircuitBreaker(name = "myService", fallbackMethod = "fallbackMethodCoord")
+	@CircuitBreaker(name = "byCoordinates", fallbackMethod = "fallbackMethodCoord")
 	public String[] getSongs(@RequestBody Coordinates coord) {
 		weatherAPIInvokerCoord = weatherAPIInvokerFactory.createWeatherAPIInvokerCoord();
 		double temperature = weatherAPIInvokerCoord.getTemperature(coord);
@@ -130,7 +130,7 @@ public class ResponseController {
 	}
 	
 	@RequestMapping(value = "/topgenre/", method = RequestMethod.GET)
-	@CircuitBreaker(name = "myService", fallbackMethod = "fallbackMethodTopGenre")
+	@CircuitBreaker(name = "topGenre", fallbackMethod = "fallbackMethodTopGenre")
     public String getTopGenre() {
         Pageable pageable = PageRequest.of(0, 1);
         List<Object[]> result = serviceCallRepository.findTopGenre(pageable);
@@ -148,7 +148,7 @@ public class ResponseController {
     }
 	
 	@RequestMapping(value = "/toplocation/", method = RequestMethod.GET)
-	@CircuitBreaker(name = "myService", fallbackMethod = "fallbackMethodTopLocation")
+	@CircuitBreaker(name = "topLocation", fallbackMethod = "fallbackMethodTopLocation")
     public String getTopLocation() {
         Pageable pageable = PageRequest.of(0, 1);
         List<Object[]> result = serviceCallRepository.findTopLocation(pageable);
@@ -165,21 +165,26 @@ public class ResponseController {
         return "Service Call History Table returned no results."; 
     }
 	
-    public String[] fallbackMethodCity(Exception e) {
+    public String[] fallbackMethodCity(String city, Exception e) {
+    	logger.info("Executing fallback method for city name: " + e.getMessage());
     	return new String[] { "Service not available when fetching temperature"
-    			+ " for a city. Please try again later." };
+    			+ " for city " + city + ". Please make sure it's a valid city and try again later." };
     }
     
-    public String[] fallbackMethodCoord(Exception e) {
+    public String[] fallbackMethodCoord(Coordinates cord, Exception e) {
+    	
+    	logger.info("Executing fallback method for Coordinates: " + e.getMessage());
     	return new String[] { "Service not available when fetching temperature"
-    			+ " for a set of coordinates. Please try again later." };
+    			+ " for the set of coordinates: " + cord.getLatitude()+ ", " + cord.getLongitude() + ". Please try again later." };
     }
     
     public String fallbackMethodTopGenre(Exception e) {
+    	logger.info("Executing fallback method for Top Genre Service : " + e.getMessage());
     	return "Service not available when fetching the top genre. Please try again later.";
     }
     
     public String fallbackMethodTopLocation(Exception e) {
+    	logger.info("Executing fallback method for Top Location Service: " + e.getMessage());
     	return "Service not available when fetching the top location. Please try again later.";
     }
 }
