@@ -98,7 +98,7 @@ Any user using their Client ID and Secret when calling the Spotify API needs to 
 - Classic
 - Party
 
-If you face any issues trying to get this app running, feel free to call me or send me a WhatsApp message, as you already have my number.
+If you face any issues trying to get this app running, feel free to call me or send me a WhatsApp message, since you already have my number.
 
 ## Architecture
 
